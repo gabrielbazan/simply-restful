@@ -18,8 +18,19 @@ class Model(Base):
         }
 
     @property
+    def relationship_classes(self):
+        return [
+            getattr(self.__class__, t).property.mapper.class_
+            for f, t in self.relationships.iteritems()
+        ]
+
+    @property
     def primary_keys(self):
         return [c.name for c in self.__mapper__.primary_key]
+
+    @property
+    def columns(self):
+        return [c.name for c in self.model.__table__.columns]
 
 
 class Geometry(GeoAlchemyGeometry):

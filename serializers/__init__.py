@@ -54,16 +54,18 @@ class Serializer(object):
         return self.serialize(self.query.get(id))
 
     def list(self, filters):
-        columns = [c.name for c in self.model.__table__.columns]
-        # filters = {k: v for k, v in filters.iteritems() if k in columns}
 
-        cond = Filter(self.model, filters).to_orm()
-        print 'cond: ', cond
+        orm_filters = Filter(self.model, filters)
+
+        query = self.query.join(
+            *orm_filters.join
+        ).filter(
+            orm_filters.filter
+        )
 
         return dict(
-            # self.query.filter_by(**filters).all()
-            results=[self.serialize(m) for m in self.query.filter(cond).all()],
-            count=self.query.count()
+            results=[self.serialize(m) for m in query.all()],
+            count=query.count()
         )
 
     def delete(self, id):
@@ -85,6 +87,7 @@ class Serializer(object):
                     value = getattr(self, relationships[name])().serialize(
                         getattr(instance, relationships[name])
                     )
+                    name = relationships[name]
 
                 serialized[name] = value
         return serialized

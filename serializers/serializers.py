@@ -9,7 +9,3 @@ class ProvinceSerializer(Serializer):
 class LakeSerializer(Serializer):
     model = Lake
     province = ProvinceSerializer
-
-
-l = Lake()
-#l.geom
