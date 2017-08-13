@@ -24,6 +24,15 @@ class Filter(object):
         print a
         return a
 
+    """
+    {
+        'province__id': 1,                      [province, id]                      [province, id, eq]
+        'province__id__ge': 1,                  [province, id, ge]                  [province, id, ge]
+        'province__state__name: 'LA',           [province, state, name]             [province, state, name, eq]
+        'province__state__population__gt': 1    [province, state, population, gt]   [province, state, population, gt]
+    }
+    """
+
     @property
     def filter(self):
         orm = []

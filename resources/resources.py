@@ -10,3 +10,8 @@ class LakeResource(Resource):
 class ProvinceResource(Resource):
     endpoint = 'provinces'
     serializer = ProvinceSerializer
+
+
+class StateResource(Resource):
+    endpoint = 'states'
+    serializer = StateSerializer
