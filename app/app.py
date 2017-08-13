@@ -11,8 +11,13 @@ app.url_map.strict_slashes = False
 
 
 @app.errorhandler(IntegrityError)
-def all_exception_handler(e):
+def integrity_error(e):
     return jsonify(dict(message='Integrity error', detail=str(e))), 409
+
+
+@app.errorhandler(Exception)
+def unknown_error(e):
+    return jsonify(dict(message='Unknown error', detail=str(e))), 500
 
 
 @app.teardown_appcontext

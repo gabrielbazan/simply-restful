@@ -11,31 +11,19 @@ class Filter(object):
         'like': 'like', 'notlike': 'notlike',
         'ilike': 'ilike', 'notilike': 'notilike',
         'is': 'is_', 'isnot': 'isnot',
-        'intersects': ''
+        'intersects': 'ST_Intersects',
+        'contains': 'ST_Intersects'
     }
+
+    multiple = ['in', 'notin']  # Between
 
     def __init__(self, model, filters):
         self.model = model
         self.filters = filters
 
-    @property
-    def join(self):
-        a = self.model().relationship_classes
-        print a
-        return a
-
-    """
-    {
-        'province__id': 1,                      [province, id]                      [province, id, eq]
-        'province__id__ge': 1,                  [province, id, ge]                  [province, id, ge]
-        'province__state__name: 'LA',           [province, state, name]             [province, state, name, eq]
-        'province__state__population__gt': 1    [province, state, population, gt]   [province, state, population, gt]
-    }
-    """
-
-    @property
-    def filter(self):
+    def translate(self):
         orm = []
+        joins = []
         for f, value in self.filters.iteritems():
             split = f.split('__')
 
@@ -43,18 +31,33 @@ class Filter(object):
 
             op = split.pop() if last in self.map else 'eq'
 
-            # self.model.province.property.mapper.class_
+            column_name = split.pop()
 
-            column = self.model.province.property.mapper.class_.id
+            model = self.model
+            for nested in split:
+                model = getattr(model, nested).mapper.class_
+                joins.append(model)
 
-            #model = self.model
-            #for c in split:
-            #    column = getattr(model, c)
-
-            print 'column, operation, value: ', column, op, value
+            if op in self.multiple:
+                value = value.split(';')
 
             orm.append(
-                getattr(column, self.map[op])(value)
+                getattr(
+                    getattr(model, column_name),
+                    self.map[op]
+                )(value)
             )
 
-        return and_(*orm)
+        return and_(*orm), joins
+
+
+"""
+{
+    'id': 1,                                [id]                                [id, eq]
+    'id__gt': 1,                            [id]                                [id, gt]
+    'province__id': 1,                      [province, id]                      [province, id, eq]
+    'province__id__ge': 1,                  [province, id, ge]                  [province, id, ge]
+    'province__state__name: 'LA',           [province, state, name]             [province, state, name, eq]
+    'province__state__population__gt': 1    [province, state, population, gt]   [province, state, population, gt]
+}
+"""

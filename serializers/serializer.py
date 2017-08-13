@@ -54,14 +54,11 @@ class Serializer(object):
         return self.serialize(self.query.get(id))
 
     def list(self, filters):
+        query = self.query
 
-        orm_filters = Filter(self.model, filters)
-
-        query = self.query.join(
-            *orm_filters.join
-        ).filter(
-            orm_filters.filter
-        )
+        if filters:
+            filters, join = Filter(self.model, filters).translate()
+            query = self.query.join(*join).filter(filters)
 
         return dict(
             results=[self.serialize(m) for m in query.all()],
