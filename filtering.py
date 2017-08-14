@@ -1,4 +1,5 @@
 from sqlalchemy import and_
+from settings import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 
 
 class Filter(object):
@@ -15,7 +16,7 @@ class Filter(object):
         'contains': 'ST_Intersects'
     }
 
-    multiple = ['in', 'notin']  # Between
+    multiple = ['in', 'notin']  # TODO: Implement Between filter
 
     def __init__(self, model, filters):
         self.model = model
@@ -24,6 +25,14 @@ class Filter(object):
     def translate(self):
         orm = []
         joins = []
+
+        size = int(self.filters.pop('limit', DEFAULT_PAGE_SIZE))
+        limit = MAX_PAGE_SIZE if size > MAX_PAGE_SIZE else size
+        offset = int(self.filters.pop('offset', 0))
+
+        order = self.filters.pop('order_by', None)
+        print order
+
         for f, value in self.filters.iteritems():
             split = f.split('__')
 
@@ -48,16 +57,4 @@ class Filter(object):
                 )(value)
             )
 
-        return and_(*orm), joins
-
-
-"""
-{
-    'id': 1,                                [id]                                [id, eq]
-    'id__gt': 1,                            [id]                                [id, gt]
-    'province__id': 1,                      [province, id]                      [province, id, eq]
-    'province__id__ge': 1,                  [province, id, ge]                  [province, id, ge]
-    'province__state__name: 'LA',           [province, state, name]             [province, state, name, eq]
-    'province__state__population__gt': 1    [province, state, population, gt]   [province, state, population, gt]
-}
-"""
+        return and_(*orm), joins, limit, offset

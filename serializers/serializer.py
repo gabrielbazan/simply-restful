@@ -1,6 +1,6 @@
 from datetime import datetime
 from database import session
-from settings import DATE_FORMAT, DEFAULT_AUTHENTICATION, DEFAULT_AUTHORIZATION
+from settings import *
 
 from util import instantiate
 from models import get_class_by_table_name
@@ -54,11 +54,10 @@ class Serializer(object):
         return self.serialize(self.query.get(id))
 
     def list(self, filters):
-        query = self.query
+        # TODO: Implement ordering
+        where, join, limit, offset = Filter(self.model, filters).translate()
 
-        if filters:
-            filters, join = Filter(self.model, filters).translate()
-            query = self.query.join(*join).filter(filters)
+        query = self.query.join(* join).filter(where).limit(limit).offset(offset)
 
         return dict(
             results=[self.serialize(m) for m in query.all()],

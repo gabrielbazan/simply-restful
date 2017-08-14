@@ -4,3 +4,6 @@ PORT = 5000
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 DEFAULT_AUTHENTICATION = ['authenticators.BasicAuthenticator']
 DEFAULT_AUTHORIZATION = []
+
+DEFAULT_PAGE_SIZE = 10
+MAX_PAGE_SIZE = 100
