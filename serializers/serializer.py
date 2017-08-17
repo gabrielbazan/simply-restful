@@ -53,14 +53,22 @@ class Serializer(object):
     def read(self, id):
         return self.serialize(self.query.get(id))
 
-    def list(self, filters):
-        # TODO: Implement ordering
-        where, join, limit, offset = Filter(self.model, filters).translate()
+    def list(self, filtering):
+        filters = Filter(self.model, filtering)
 
-        query = self.query.join(* join).filter(where).limit(limit).offset(offset)
+        query = self.query.join(
+            * filters.joins
+        ).filter(
+            filters.orm_filters
+        ).order_by(
+            * filters.order_by
+        )
 
         return dict(
-            results=[self.serialize(m) for m in query.all()],
+            results=[
+                self.serialize(m)
+                for m in query.limit(filters.limit).offset(filters.offset).all()
+            ],
             count=query.count()
         )
 

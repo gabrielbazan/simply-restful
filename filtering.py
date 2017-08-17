@@ -22,17 +22,23 @@ class Filter(object):
         self.model = model
         self.filters = filters
 
-    def translate(self):
-        orm = []
-        joins = []
+        self._orm_filters = []
+        self.joins = []
+        self.order_by = []
 
         size = int(self.filters.pop('limit', DEFAULT_PAGE_SIZE))
-        limit = MAX_PAGE_SIZE if size > MAX_PAGE_SIZE else size
-        offset = int(self.filters.pop('offset', 0))
 
-        order = self.filters.pop('order_by', None)
-        print order
+        self.limit = MAX_PAGE_SIZE if size > MAX_PAGE_SIZE else size
+        self.offset = int(self.filters.pop('offset', 0))
 
+        self._translate_order()
+        self._translate_filters()
+
+    @property
+    def orm_filters(self):
+        return and_(*self._orm_filters)
+
+    def _translate_filters(self):
         for f, value in self.filters.iteritems():
             split = f.split('__')
 
@@ -45,16 +51,37 @@ class Filter(object):
             model = self.model
             for nested in split:
                 model = getattr(model, nested).mapper.class_
-                joins.append(model)
+                if model not in self.joins:
+                    self.joins.append(model)
 
             if op in self.multiple:
                 value = value.split(';')
+                if not value[-1]:
+                    value.pop()
 
-            orm.append(
+            self._orm_filters.append(
                 getattr(
                     getattr(model, column_name),
                     self.map[op]
                 )(value)
             )
 
-        return and_(*orm), joins, limit, offset
+    def _translate_order(self):
+        ops = ['asc', 'desc']
+        order = self.filters.pop('order_by', None)
+        orders = order.split(';') if order else []
+        for order in orders:
+            split = order.split('__')
+            last = split[-1]
+
+            op = split.pop() if last in ops else 'asc'
+
+            column_name = split.pop()
+
+            model = self.model
+            for nested in split:
+                model = getattr(model, nested).mapper.class_
+                self.joins.append(model)
+            self.order_by.append(
+                getattr(getattr(model, column_name), op)()
+            )
