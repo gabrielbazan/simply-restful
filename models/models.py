@@ -2,22 +2,23 @@ from sqlalchemy import Column, Integer, Text, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import engine
-from . import Model, Geometry
+from model import Model
+from geometry import Geometry
+
+
+class Country(Model):
+    __tablename__ = 'country'
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False, unique=True)
+    created = Column(DateTime, default=func.now())
 
 
 class State(Model):
     __tablename__ = 'state'
     id = Column(Integer, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
-    created = Column(DateTime, default=func.now())
-
-
-class Province(Model):
-    __tablename__ = 'province'
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False, unique=True)
-    state_id = Column(Integer, ForeignKey('state.id'), nullable=False)
-    state = relationship('State')
+    country_id = Column(Integer, ForeignKey('country.id'), nullable=False)
+    country = relationship('Country')
 
 
 class Lake(Model):
@@ -26,8 +27,8 @@ class Lake(Model):
     name = Column(Text, nullable=False, unique=True)
     created = Column(DateTime, default=func.now())
     geom = Column(Geometry('POLYGON', srid=4326))
-    province_id = Column(Integer, ForeignKey('province.id'), nullable=False)
-    province = relationship('Province', backref='lakes')
+    state_id = Column(Integer, ForeignKey('state.id'), nullable=False)
+    state = relationship('State', backref='lakes')
 
 
 if __name__ == '__main__':

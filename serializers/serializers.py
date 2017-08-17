@@ -2,15 +2,15 @@ from . import Serializer
 from models.models import *
 
 
+class CountrySerializer(Serializer):
+    model = Country
+
+
 class StateSerializer(Serializer):
     model = State
-
-
-class ProvinceSerializer(Serializer):
-    model = Province
-    state = StateSerializer
+    country = CountrySerializer
 
 
 class LakeSerializer(Serializer):
     model = Lake
-    province = ProvinceSerializer
+    state = StateSerializer

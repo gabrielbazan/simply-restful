@@ -73,7 +73,8 @@ class Serializer(object):
         )
 
     def delete(self, id):
-        return self.query.filter_by(id=id).delete()
+        self.query.filter_by(id=id).delete()
+        session.commit()
 
     def serialize(self, instance):
         serialized = dict()
