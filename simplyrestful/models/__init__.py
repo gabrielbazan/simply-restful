@@ -1,6 +1,6 @@
-from database import Base
-from model import Model
 from geometry import Geometry
+from model import Model
+from simplyrestful.database import Base
 
 
 def get_class_by_table_name(table_name):

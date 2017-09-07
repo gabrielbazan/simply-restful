@@ -1,4 +1,4 @@
-from database import Base
+from simplyrestful.database import Base
 
 
 class Model(Base):
