@@ -1,5 +1,6 @@
 from sqlalchemy import and_
-from settings import DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
+
+from settings import settings
 
 
 class Filter(object):
@@ -26,9 +27,9 @@ class Filter(object):
         self.joins = []
         self.order_by = []
 
-        size = int(self.filters.pop('limit', DEFAULT_PAGE_SIZE))
+        size = int(self.filters.pop('limit', settings['DEFAULT_PAGE_SIZE']))
 
-        self.limit = MAX_PAGE_SIZE if size > MAX_PAGE_SIZE else size
+        self.limit = settings['MAX_PAGE_SIZE'] if size > settings['MAX_PAGE_SIZE'] else size
         self.offset = int(self.filters.pop('offset', 0))
 
         self._translate_order()

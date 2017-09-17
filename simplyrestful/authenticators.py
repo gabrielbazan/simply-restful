@@ -4,6 +4,6 @@ class Authenticator(object):
         pass
 
 
-class BasicAuthenticator(Authenticator):
+class NullAuthenticator(Authenticator):
     def authenticate(self):
         return 1

@@ -22,3 +22,21 @@ class Resource(FlaskResource):
         return self._serializer.read(id) if id else self._serializer.list(
             request.args.to_dict()
         )
+
+
+def add_resource(api, resource, identifier_type='int'):
+    endpoint = resource.endpoint
+
+    api.add_resource(
+        resource,
+        '/{}'.format(endpoint),
+        methods=['GET', 'POST'],
+        endpoint='{}-list'.format(endpoint)
+    )
+
+    api.add_resource(
+        resource,
+        '/{}/<{}:id>'.format(endpoint, identifier_type),
+        methods=['GET', 'PUT', 'DELETE'],
+        endpoint=endpoint + '-detail'
+    )

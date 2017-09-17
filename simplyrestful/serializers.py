@@ -1,10 +1,11 @@
 from datetime import datetime
-from database import session
-from settings import *
 
-from util import instantiate
-from models import get_class_by_table_name
+from database import session
 from filtering import Filter
+from simplyrestful.models import get_class_by_table_name
+from util import instantiate
+
+from settings import settings
 
 
 class Serializer(object):
@@ -14,7 +15,7 @@ class Serializer(object):
     fields = None
 
     methods = {
-        datetime: lambda x: x.strftime(DATE_FORMAT)
+        datetime: lambda x: x.strftime(settings['DATE_FORMAT'])
     }
 
     @property
@@ -25,11 +26,11 @@ class Serializer(object):
         self.query = session.query(self.model)
         if not self.authenticators:
             self.authenticators = [
-                instantiate(a) for a in DEFAULT_AUTHENTICATION
+                instantiate(a) for a in settings['DEFAULT_AUTHENTICATION']
             ]
         if not self.authorizers:
             self.authorizers = [
-                instantiate(a) for a in DEFAULT_AUTHORIZATION
+                instantiate(a) for a in settings['DEFAULT_AUTHORIZATION']
             ]
         self.user = self._authenticate()
 
