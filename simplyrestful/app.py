@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from sqlalchemy.exc import IntegrityError
-from database import session
 
 
 app = Flask(__name__)
@@ -22,4 +21,5 @@ def unknown_error(e):
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
+    from database import session
     session.close()
