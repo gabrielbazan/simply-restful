@@ -5,11 +5,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from settings import settings
 
 
-Base = declarative_base()
-
-print 'Using database: {}'.format(settings['DATABASE'])
-
 engine = create_engine(settings['DATABASE'])
+
+session = scoped_session(sessionmaker(bind=engine))
+
+Base = declarative_base()
+Base.query = session.query_property()
 Base.metadata.bind = engine
-DBSession = scoped_session(sessionmaker(bind=engine))
-session = DBSession()

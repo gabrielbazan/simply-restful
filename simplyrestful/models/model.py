@@ -1,10 +1,8 @@
-from simplyrestful.database import Base, DBSession
+from simplyrestful.database import Base
 
 
 class Model(Base):
     __abstract__ = True
-
-    query = DBSession.query_property()
 
     @property
     def relationships(self):
