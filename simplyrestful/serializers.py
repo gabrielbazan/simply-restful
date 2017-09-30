@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from database import session
-from filtering import Filter
+from simplyrestful.database import session
+from simplyrestful.filtering import Filter
 from simplyrestful.models import get_class_by_table_name
-from util import instantiate
+from simplyrestful.exceptions import NotFound
+from simplyrestful.util import instantiate
 
 from settings import settings
 
@@ -20,7 +21,7 @@ class Serializer(object):
 
     @property
     def model(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def __init__(self):
         self.query = session.query(self.model)
@@ -32,27 +33,39 @@ class Serializer(object):
             self.authorizers = [
                 instantiate(a) for a in settings['DEFAULT_AUTHORIZATION']
             ]
-        self.user = self._authenticate()
+        self.user = self.authenticate()
 
     def create(self, data):
         instance = self.model()
         self.deserialize(data, instance)
+        self.validate(instance)
         session.add(instance)
         session.flush()
         serial = self.serialize(instance)
         session.commit()
         return serial
 
-    def update(self, id, data):
-        instance = self.query.get(id)
+    def update(self, identifier, data):
+        instance = self._get_instance(identifier)
         self.deserialize(data, instance)
+        self.validate(instance)
         session.flush()
         serial = self.serialize(instance)
         session.commit()
         return serial
 
-    def read(self, id):
-        return self.serialize(self.query.get(id))
+    def read(self, identifier):
+        return self.serialize(self._get_instance(identifier))
+
+    def _get_instance(self, identifier):
+        instance = self.query.get(identifier)
+        if not instance:
+            raise NotFound(
+                '"{}" with identifier "{}"'.format(
+                    self.model.__class__.__name__, identifier
+                )
+            )
+        return instance
 
     def list(self, filtering):
         filters = Filter(self.model, filtering)
@@ -122,17 +135,17 @@ class Serializer(object):
                 data[key] = value
         return data
 
-    def _authenticate(self):
+    def authenticate(self):
         for authenticator in self.authenticators:
             user = authenticator.authenticate()
             if user:
                 return user
         raise Exception('Authentication error')
 
-    def _authorize(self):
+    def authorize(self, instance):
         for authorizer in self.authorizers:
-            authorizer.authorize()
+            authorizer.authorize(instance)
 
-    def _validate(self):
+    def validate(self, instance):
         for validator in self.validators:
-            validator.validate()
+            validator().validate(instance)
