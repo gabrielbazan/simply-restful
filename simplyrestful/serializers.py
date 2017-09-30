@@ -37,8 +37,8 @@ class Serializer(object):
 
     def create(self, data):
         instance = self.model()
+        self.validate(data)
         self.deserialize(data, instance)
-        self.validate(instance)
         session.add(instance)
         session.flush()
         serial = self.serialize(instance)
@@ -47,8 +47,8 @@ class Serializer(object):
 
     def update(self, identifier, data):
         instance = self._get_instance(identifier)
+        self.validate(data)
         self.deserialize(data, instance)
-        self.validate(instance)
         session.flush()
         serial = self.serialize(instance)
         session.commit()
