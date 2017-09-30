@@ -12,7 +12,7 @@ app.url_map.strict_slashes = False
 
 @app.errorhandler(NotFound)
 def not_found_error(e):
-    return jsonify(dict(message='Not found', detail=str(e))), 409
+    return jsonify(dict(message='Not found', detail=str(e))), 404
 
 
 @app.errorhandler(IntegrityError)

@@ -61,9 +61,7 @@ class Serializer(object):
         instance = self.query.get(identifier)
         if not instance:
             raise NotFound(
-                '"{}" with identifier "{}"'.format(
-                    self.model.__class__.__name__, identifier
-                )
+                'Identifier "{}"'.format(identifier)
             )
         return instance
 
