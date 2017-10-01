@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_restful import Api
 from sqlalchemy.exc import IntegrityError
-from simplyrestful.exceptions import NotFound
+from simplyrestful.exceptions import NotFound, Conflict
 
 
 app = Flask(__name__)
@@ -13,6 +13,11 @@ app.url_map.strict_slashes = False
 @app.errorhandler(NotFound)
 def not_found_error(e):
     return jsonify(dict(message='Not found', detail=str(e))), 404
+
+
+@app.errorhandler(Conflict)
+def not_found_error(e):
+    return jsonify(dict(message='Conflict', detail=str(e))), 409
 
 
 @app.errorhandler(IntegrityError)

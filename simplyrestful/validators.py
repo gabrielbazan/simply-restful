@@ -1,4 +1,4 @@
 
 class Validator(object):
-    def validate(self, instance):
+    def validate(self, data):
         pass
