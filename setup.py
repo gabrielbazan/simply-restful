@@ -6,7 +6,7 @@ except ImportError:
 
 setup(
     name='simplyrestful',
-    version='0.2.4',
+    version='0.2.5',
     keywords='Simply ReSTful REST API',
     license='MIT',
     platforms='all',
@@ -18,7 +18,7 @@ setup(
     url='https://github.com/gabrielbazan/simply-restful/',
     download_url='https://github.com/gabrielbazan/simply-restful/',
     description='A simple framework to quickly implement ReSTful APIs.',
-    long_description=open('README.md').read(),
+    long_description=open('README.txt').read(),
     packages=[
         'simplyrestful',
         'simplyrestful/models'
