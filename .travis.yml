@@ -1,0 +1,7 @@
+deploy:
+  provider: pypi
+  user: "gbazan"
+  password:
+    secure: "Your encrypted password"
+  on:
+    tags: true
