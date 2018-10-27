@@ -5,7 +5,14 @@ from simplyrestful.exceptions import NotFound, Conflict
 
 
 app = Flask(__name__)
+
+handle_exceptions = app.handle_exception
+handle_user_exception = app.handle_user_exception
+
 api = Api(app)
+
+app.handle_user_exception = handle_exceptions
+app.handle_user_exception = handle_user_exception
 
 app.url_map.strict_slashes = False
 
