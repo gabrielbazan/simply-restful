@@ -1,3 +1,5 @@
+
+
 settings = dict(
     DATABASE='postgresql://postgres:postgres@localhost/simply_restful',
     HOST='0.0.0.0',

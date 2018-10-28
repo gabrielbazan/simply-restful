@@ -7,12 +7,18 @@ class Filter(object):
 
     map = {
         'eq': '__eq__',
-        'gt': '__gt__', 'ge': '__ge__',
-        'lt': '__lt__', 'le': '__le__',
-        'in': 'in_', 'notin': 'notin_',
-        'like': 'like', 'notlike': 'notlike',
-        'ilike': 'ilike', 'notilike': 'notilike',
-        'is': 'is_', 'isnot': 'isnot',
+        'gt': '__gt__',
+        'ge': '__ge__',
+        'lt': '__lt__',
+        'le': '__le__',
+        'in': 'in_',
+        'notin': 'notin_',
+        'like': 'like',
+        'notlike': 'notlike',
+        'ilike': 'ilike',
+        'notilike': 'notilike',
+        'is': 'is_',
+        'isnot': 'isnot',
         'intersects': 'ST_Intersects',
         'contains': 'ST_Intersects'
     }
