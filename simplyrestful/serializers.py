@@ -36,26 +36,38 @@ class Serializer(object):
         self.user = self.authenticate()
 
     def create(self, data):
-        instance = self.model()
-        self.validate(data)
-        self.deserialize(data, instance)
-        session.add(instance)
-        session.flush()
-        serial = self.serialize(instance)
-        session.commit()
-        return serial
+        try:
+            instance = self.model()
+            self.validate(data)
+            self.deserialize(data, instance)
+            session.add(instance)
+            session.flush()
+            serialized = self.serialize(instance)
+            session.commit()
+            return serialized
+        except:
+            session.rollback()
+            raise
 
     def update(self, identifier, data):
-        instance = self._get_instance(identifier)
-        self.validate(data)
-        self.deserialize(data, instance)
-        session.flush()
-        serial = self.serialize(instance)
-        session.commit()
-        return serial
+        try:
+            instance = self._get_instance(identifier)
+            self.validate(data)
+            self.deserialize(data, instance)
+            session.flush()
+            serialized = self.serialize(instance)
+            session.commit()
+            return serialized
+        except:
+            session.rollback()
+            raise
 
     def read(self, identifier):
-        return self.serialize(self._get_instance(identifier))
+        try:
+            return self.serialize(self._get_instance(identifier))
+        except:
+            session.rollback()
+            raise
 
     def _get_instance(self, identifier):
         instance = self.query.get(identifier)
@@ -66,27 +78,35 @@ class Serializer(object):
         return instance
 
     def list(self, filtering):
-        filters = Filter(self.model, filtering)
+        try:
+            filters = Filter(self.model, filtering)
 
-        query = self.query.join(
-            * filters.joins
-        ).filter(
-            filters.orm_filters
-        ).order_by(
-            * filters.order_by
-        )
+            query = self.query.join(
+                *filters.joins
+            ).filter(
+                filters.orm_filters
+            ).order_by(
+                *filters.order_by
+            )
 
-        return dict(
-            results=[
-                self.serialize(m)
-                for m in query.limit(filters.limit).offset(filters.offset).all()
-            ],
-            count=query.count()
-        )
+            return dict(
+                results=[
+                    self.serialize(m)
+                    for m in query.limit(filters.limit).offset(filters.offset).all()
+                ],
+                count=query.count()
+            )
+        except:
+            session.rollback()
+            raise
 
-    def delete(self, id):
-        self.query.filter_by(id=id).delete()
-        session.commit()
+    def delete(self, identifier):
+        try:
+            self.query.filter_by(id=identifier).delete()
+            session.commit()
+        except:
+            session.rollback()
+            raise
 
     def serialize(self, instance):
         serialized = dict()
@@ -112,13 +132,14 @@ class Serializer(object):
 
     def deserialize(self, data, instance):
         data.update(
-            self._deserialize_relationsips(data, instance)
+           Serializer.deserialize_relationships(data, instance)
         )
         for prop in data:
             if prop not in instance.primary_keys:
                 setattr(instance, prop, data.get(prop))
 
-    def _deserialize_relationsips(self, data, instance):
+    @staticmethod
+    def deserialize_relationships(data, instance):
         for relationship in instance.__mapper__.relationships:
             target = relationship.local_remote_pairs[0][1]
             key = relationship.key
