@@ -52,7 +52,7 @@ class Serializer(object):
     def update(self, identifier, data):
         try:
             instance = self._get_instance(identifier)
-            self.validate(data)
+            self.validate(data, instance=instance)
             self.deserialize(data, instance)
             session.flush()
             serialized = self.serialize(instance)
@@ -165,6 +165,6 @@ class Serializer(object):
         for authorizer in self.authorizers:
             authorizer.authorize(instance)
 
-    def validate(self, instance):
+    def validate(self, data, instance=None):
         for validator in self.validators:
-            validator().validate(instance)
+            validator().validate(data, instance=instance)
