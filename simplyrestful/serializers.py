@@ -82,11 +82,13 @@ class Serializer(object):
             filters = Filter(self.model, filtering)
 
             query = self.query.join(
-                *filters.joins
+                * filters.joins
+            ).filter(
+                self._list_filters()
             ).filter(
                 filters.orm_filters
             ).order_by(
-                *filters.order_by
+                * filters.order_by
             )
 
             return dict(
@@ -100,13 +102,19 @@ class Serializer(object):
             session.rollback()
             raise
 
+    def _list_filters(self):
+        return ()
+
     def delete(self, identifier):
         try:
-            self.query.filter_by(id=identifier).delete()
+            self._delete(identifier)
             session.commit()
         except:
             session.rollback()
             raise
+
+    def _delete(self, identifier):
+        self.query.filter_by(id=identifier).delete()
 
     def serialize(self, instance):
         serialized = dict()
