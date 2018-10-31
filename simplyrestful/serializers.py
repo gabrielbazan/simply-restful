@@ -84,7 +84,7 @@ class Serializer(object):
             query = self.query.join(
                 * filters.joins
             ).filter(
-                self._list_filters()
+                * self._list_filters()
             ).filter(
                 filters.orm_filters
             ).order_by(
