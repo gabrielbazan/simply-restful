@@ -6,7 +6,7 @@ except ImportError:
 
 setup(
     name='simplyrestful',
-    version='0.3.3',
+    version='0.3.4',
     keywords='Simply ReSTful REST API',
     license='MIT',
     platforms='all',
@@ -28,7 +28,7 @@ setup(
         'flask_restful',
         'sqlalchemy',
         'geoalchemy2',
-        'psycopg2',
+        'psycopg2-binary',
         'shapely',
         'geojson'
     ]
