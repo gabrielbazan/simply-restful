@@ -2,6 +2,6 @@ flask
 flask_restful
 sqlalchemy
 geoalchemy2
-psycopg2
+psycopg2-binary
 shapely
 geojson
