@@ -6,7 +6,7 @@ except ImportError:
 
 setup(
     name='simplyrestful',
-    version='0.3.2',
+    version='0.3.3',
     keywords='Simply ReSTful REST API',
     license='MIT',
     platforms='all',
